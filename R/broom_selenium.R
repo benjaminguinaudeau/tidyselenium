@@ -13,9 +13,11 @@ get_attribute <- function(elements, attr){
 #' get_all_attribute
 #' @export
 
-get_all_attribute <- function(element, text = F){
-  out <- element %>%
-    get_attribute("outerHTML") %>%
+get_all_attributes <- function(element, text = F){
+  html <- element %>%
+    get_attribute("outerHTML")
+  
+  out <- html %>%
     stringr::str_extract("<.*?>") %>%
     stringr::str_extract_all('\\w+=\\".*?\\"') %>% .[[1]] %>%
     stringr::str_split("\\=", n = 2) %>%
@@ -30,7 +32,7 @@ get_all_attribute <- function(element, text = F){
   }
 
   if(text){
-    out <- out %>% mutate(text = element %>% map_chr(get_text))
+    out <- out %>% mutate(text = rvest::html_text(xml2::read_html(html)))
   }
   return(out)
 }
