@@ -1,0 +1,30 @@
+---
+title: "user_agent_data"
+output: html_document
+---
+
+```{r}
+pacman::p_load(dplyr)
+
+page <- xml2::read_html(paste0("https://developers.whatismybrowser.com/useragents/explore/software_name/chrome/")) %>%
+  rvest::html_table %>% 
+  chuck(1)
+
+user_agents <- 2:10 %>%
+  purrr::map_dfr(~{
+    cat(.x)
+    xml2::read_html(paste0("https://developers.whatismybrowser.com/useragents/explore/software_name/chrome/", .x)) %>%
+      rvest::html_table %>% 
+      purrr::chuck(1)
+  }) %>%
+  dplyr::bind_row(page)
+
+user_agents <- pages %>%
+  dplyr::reduce(dplyr::bind_rows) %>%
+  dplyr::bind_rows(page) %>%
+  janitor::clean_names() %>%
+  glimpse
+
+usethis::use_data(user_agents)
+```
+

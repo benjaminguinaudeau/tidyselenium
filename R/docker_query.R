@@ -13,7 +13,7 @@ chrome_init <- function(view = T, name = "", ua = 1){
     bashR::wait(4, .5)
   }
   if(name %in% dockeR::running_containers()){
-    chrome <- dockeR::quiet(tidyweb::get_driver(port = dockeR::get_port(name, 4444), ua = ua))
+    chrome <- dockeR::quiet(get_driver(port = dockeR::get_port(name, 4444), ua = ua, cache_id = "chrome_cache"))
   }
 
   if(view == T){dockeR::view_container(name)}
@@ -22,7 +22,9 @@ chrome_init <- function(view = T, name = "", ua = 1){
 
 #' get_driver
 #' @export
-get_driver <- function(port, ua = 1){
+get_driver <- function(port, ua = NULL, browser = "chrome", cache_id = NULL){
+  
+  if(browser == "chrome"){
   eCaps <- list(
     chromeOptions =
       list(
@@ -33,18 +35,20 @@ get_driver <- function(port, ua = 1){
         ),
         args = c('--disable-dev-shm-usage',
                  '--disable-gpu',
-                 ifelse(is.null(ua), "", glue::glue('--user-agent="{dockeR::user_agents[ua]}"')))# '--no-sandbox', '--headless') #  '--window-size=1200,1800' , ,
+                 ifelse(is.null(ua), "", glue::glue('--user-agent="{tidyselenium::user_agents$user_agent[ua]}"')), 
+                 ifelse(is.null(cache_id), "", glue::glue('--user-data-dir=tmp/cache/{cache_id}') ))# '--no-sandbox', '--headless') #  '--window-size=1200,1800' , ,
       )
   )
-
+  } else {
+    ecaps <- ""
+  }
+  
   driver <- RSelenium::remoteDriver(
     remoteServerAddr = "localhost",
     port = port,
-    browserName = "chrome",
+    browserName = browser,
     extraCapabilities = eCaps
   )
-
-  driver$open()
 
   return(driver)
 }
@@ -91,7 +95,7 @@ screenshot <- function(browser, file = NULL, display = T, useViewer = T){
 #' new_window
 #' @export
 new_window <- function(port = 4444, prune = T, browser = "chrome"){
-  tmp <- get_driver(remoteServerAddr = "selenium", port = as.integer(port), browserName = browser)
+  tmp <- get_driver(port = as.integer(port), browser = browser)
   if(prune) tmp$closeall()
   tmp$open()
   return(tmp)

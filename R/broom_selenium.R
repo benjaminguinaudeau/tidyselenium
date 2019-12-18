@@ -15,7 +15,7 @@ get_attribute <- function(elements, attr){
 
 get_all_attribute <- function(element, text = F){
   out <- element %>%
-    tidyweb::get_attribute("outerHTML") %>%
+    get_attribute("outerHTML") %>%
     stringr::str_extract("<.*?>") %>%
     stringr::str_extract_all('\\w+=\\".*?\\"') %>% .[[1]] %>%
     stringr::str_split("\\=", n = 2) %>%

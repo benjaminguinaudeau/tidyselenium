@@ -8,3 +8,10 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 This package provides tool to use Selenium driver functions in pipeline.
+
+
+```{r}
+chrome <- chrome_init("chrome")
+
+```
+

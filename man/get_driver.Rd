@@ -4,7 +4,7 @@
 \alias{get_driver}
 \title{get_driver}
 \usage{
-get_driver(port, ua = 1)
+get_driver(port, ua = NULL, browser = "chrome", cache_id = NULL)
 }
 \description{
 get_driver
