@@ -84,8 +84,8 @@ highlight <- function(element, wait = .1){
 
 ## execute
 #' @export
-execute <- function(container, script){
-  chrome$executeScript(script)
+execute <- function(browser, script){
+  browser$executeScript(script)
 }
 
 ## get_location

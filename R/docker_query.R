@@ -14,6 +14,8 @@ firefox_init <- function(name = "", view = T, ua = NULL, cache = NULL){
 #' @export
 browser_init <- function(browser = "chrome", name = "", view = T, ua = NULL, cache = NULL){
   
+  if(!dockeR::is_docker_running()){stop("Docker daemon is not running, please start it and try again")}
+  
   name <- ifelse(name == "", browser, name)
   
   if(!name %in% dockeR::existing_containers()){
