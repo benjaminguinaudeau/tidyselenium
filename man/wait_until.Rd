@@ -4,8 +4,14 @@
 \alias{wait_until}
 \title{wait_until}
 \usage{
-wait_until(chrome, n_wait = 4, value = "", using = "css selector",
-  return = "", click = F)
+wait_until(
+  chrome,
+  n_wait = 4,
+  value = "",
+  using = "css selector",
+  return = "",
+  click = F
+)
 }
 \description{
 wait_until

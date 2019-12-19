@@ -4,8 +4,13 @@
 \alias{wait_and_click}
 \title{wait_and_click}
 \usage{
-wait_and_click(chrome, n_wait = 4, value = "",
-  using = "css selector", return = "")
+wait_and_click(
+  chrome,
+  n_wait = 4,
+  value = "",
+  using = "css selector",
+  return = ""
+)
 }
 \description{
 wait_and_click

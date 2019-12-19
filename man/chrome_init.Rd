@@ -4,7 +4,7 @@
 \alias{chrome_init}
 \title{chrome_init}
 \usage{
-chrome_init(view = T, name = "", ua = 1)
+chrome_init(name = "", view = T, ua = NULL, cache = NULL)
 }
 \description{
 chrome_init

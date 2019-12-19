@@ -4,8 +4,13 @@
 \alias{switch_to_frame}
 \title{switch_to_frame}
 \usage{
-switch_to_frame(chrome, div_value = "", div_using = "css selector",
-  frame_value = "", frame_using = "name")
+switch_to_frame(
+  chrome,
+  div_value = "",
+  div_using = "css selector",
+  frame_value = "",
+  frame_using = "name"
+)
 }
 \description{
 switch_to_frame

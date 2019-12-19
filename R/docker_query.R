@@ -1,11 +1,11 @@
 #' chrome_init
 #' @export
-chrome_init <- function(view = T, name = "", ua = NULL, cache = NULL){
+chrome_init <- function(name = "", view = T, ua = NULL, cache = NULL){
 
   name <- ifelse(name == "", "chrome", name)
 
   if(!name %in% dockeR::existing_containers()){
-    dockeR::create_container("selenium/standalone-chrome-debug", name)
+    dockeR::create_container("selenium/standalone-chrome-debug", name, other_arguments = "--shm-size=2g")
     bashR::wait(4, .5)
   }
   if(name %in% dockeR::stopped_containers()){
@@ -22,12 +22,37 @@ chrome_init <- function(view = T, name = "", ua = NULL, cache = NULL){
   return(chrome)
 }
 
+#' firefox_init
+#' @export
+firefox_init <- function(name = "", view = T, ua = NULL, cache = NULL){
+  
+  name <- ifelse(name == "", "firefox", name)
+  
+  if(!name %in% dockeR::existing_containers()){
+    dockeR::create_container("selenium/standalone-firefox-debug", name, other_arguments = "--shm-size=2g")
+    bashR::wait(4, .5)
+  }
+  
+  if(name %in% dockeR::stopped_containers()){
+    dockeR::start_container(name)
+    bashR::wait(4, .5)
+  }
+  if(name %in% dockeR::running_containers()){
+    firefox <- dockeR::quiet(get_driver(port = dockeR::get_port(name, 4444), ua = ua, cache_id = cache, browser = "firefox"))
+  }
+  
+  
+  
+  if(view == T){dockeR::view_container(name)}
+  return(firefox)
+}
+
 #' get_driver
 #' @export
 get_driver <- function(port, ua = NULL, browser = "chrome", cache_id = NULL){
   
   if(browser == "chrome"){
-  eCaps <- list(
+    ecaps <- list(
     chromeOptions =
       list(
         prefs = list(
@@ -37,19 +62,30 @@ get_driver <- function(port, ua = NULL, browser = "chrome", cache_id = NULL){
         ),
         args = c('--disable-dev-shm-usage',
                  '--disable-gpu',
-                 ifelse(is.null(ua), "", glue::glue('--user-agent="{tidyselenium::user_agents$user_agent[ua]}"')), 
+                 ifelse(is.null(ua), "", glue::glue('--user-agent="{stringr::str_subset(tidyselenium::user_agents$user_agent, "hrome")[ua]}"')), 
                  ifelse(is.null(cache_id), "", glue::glue('--user-data-dir=tmp/cache/{cache_id}') ))# '--no-sandbox', '--headless') #  '--window-size=1200,1800' , ,
       )
   )
+  } else if (browser == "firefox"){
+    ecaps <- RSelenium::makeFirefoxProfile(
+      list(
+        "general.useragent.override" = stringr::str_subset(tidyselenium::user_agents$user_agent, "irefox")[ua],
+        "browser.cache.disk.enable" = TRUE,
+        "browser.cache.memory.enable" = TRUE,
+        "browser.cache.offline.enable" = TRUE,
+        "network.http.use-cache" = TRUE,
+        "browser.cache.disk.parent_directory" = glue::glue("/home/seluser/{cache_id}"),
+        "browser.download.dir" = "/tmp/")
+      )
   } else {
-    ecaps <- ""
+    ecaps <- list()
   }
   
   driver <- RSelenium::remoteDriver(
     remoteServerAddr = "localhost",
     port = port,
     browserName = browser,
-    extraCapabilities = eCaps
+    extraCapabilities = ecaps
   )
 
   return(driver)
@@ -106,6 +142,24 @@ new_window <- function(port = 4444, prune = T, browser = "chrome"){
 }
 
 #' get_source_code
+#' @export
+get_source_code <- function(browser, filepath = NULL){
+
+  tmp <- browser$executeScript("return window.document.getElementsByTagName('html')[0].outerHTML")
+
+  page <- tmp[[1]] %>%
+    xml2::read_html(.)
+
+  if(is.null(filepath)){
+    return(page)
+  } else {
+    page %>% xml2::write_html(., file = filepath)
+    message(glue::glue("Source code was saved under { filepath }"))
+  }
+
+}
+
+#' get_real_source_code
 #' @export
 get_real_source_code <- function(browser, filepath = NULL){
 
