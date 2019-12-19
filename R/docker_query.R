@@ -1,6 +1,6 @@
 #' chrome_init
 #' @export
-chrome_init <- function(view = T, name = "", ua = 1){
+chrome_init <- function(view = T, name = "", ua = NULL, cache = NULL){
 
   name <- ifelse(name == "", "chrome", name)
 
@@ -13,9 +13,11 @@ chrome_init <- function(view = T, name = "", ua = 1){
     bashR::wait(4, .5)
   }
   if(name %in% dockeR::running_containers()){
-    chrome <- dockeR::quiet(get_driver(port = dockeR::get_port(name, 4444), ua = ua, cache_id = "chrome_cache"))
+    chrome <- dockeR::quiet(get_driver(port = dockeR::get_port(name, 4444), ua = ua, cache_id = cache))
   }
 
+  
+  
   if(view == T){dockeR::view_container(name)}
   return(chrome)
 }
@@ -58,7 +60,9 @@ get_driver <- function(port, ua = NULL, browser = "chrome", cache_id = NULL){
 refresh_window <- function(chrome, max = T){
   if(!max){max_size <- function(x) return(x)}
   chrome %>%
-    close_all %>% open %>% max_size
+    close_all %>% 
+    open %>% 
+    max_size
   return(invisible(chrome))
 }
 
