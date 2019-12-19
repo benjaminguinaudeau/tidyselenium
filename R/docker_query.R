@@ -49,10 +49,15 @@ get_driver <- function(port, ua = NULL, browser = "chrome", cache_id = NULL){
             # "download.prompt_for_download" = F
             # #"download.default_directory" = "~/extract_temp"
           ),
-          args = c('--disable-dev-shm-usage',
-                   '--disable-gpu',
-                   ifelse(is.null(ua), "", glue::glue('--user-agent="{stringr::str_subset(tidyselenium::user_agents$user_agent, "hrome")[ua]}"')), 
-                   ifelse(is.null(cache_id), "", glue::glue('--user-data-dir=tmp/cache/{cache_id}') ))# '--no-sandbox', '--headless') #  '--window-size=1200,1800' , ,
+          args = purrr::discard(
+            c(
+              '--disable-dev-shm-usage',
+              '--disable-gpu',
+              ifelse(is.null(ua), "", glue::glue('--user-agent="{stringr::str_subset(tidyselenium::user_agents$user_agent, "hrome")[ua]}"')), 
+              ifelse(is.null(cache_id), "", glue::glue('--user-data-dir=tmp/cache/{cache_id}') )
+            ), # '--no-sandbox', '--headless') #  '--window-size=1200,1800' , ,
+            ~.x == ""
+          )
         )
     )
   } else if (browser == "firefox"){
