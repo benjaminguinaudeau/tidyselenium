@@ -40,6 +40,14 @@ browser_init <- function(browser = "chrome", name = "", view = T, ua = NULL, cac
 #' @export
 get_driver <- function(port, ua = NULL, browser = "chrome", cache_id = NULL){
   
+  if(!is.null(ua)){
+    if(is.character(ua)){
+      ua <- glue::glue('--user-agent="{ua}"')
+    } else {
+      ua <- glue::glue('--user-agent="{stringr::str_subset(tidyselenium::user_agents$user_agent, "hrome")[ua]}"')
+    }
+  }
+  
   if(browser == "chrome"){
     ecaps <- list(
       chromeOptions =
@@ -53,7 +61,13 @@ get_driver <- function(port, ua = NULL, browser = "chrome", cache_id = NULL){
             c(
               '--disable-dev-shm-usage',
               '--disable-gpu',
-              ifelse(is.null(ua), "", glue::glue('--user-agent="{stringr::str_subset(tidyselenium::user_agents$user_agent, "hrome")[ua]}"')), 
+              "--no-sandbox",
+              "--disable-setuid-sandbox",
+              "--disable-infobars",
+              "--window-position=0,0",
+              "--ignore-certifcate-errors",
+              "--ignore-certifcate-errors-spki-list",
+              ifelse(is.null(ua), "", ua), 
               ifelse(is.null(cache_id), "", glue::glue('--user-data-dir=tmp/cache/{cache_id}') )
             ), # '--no-sandbox', '--headless') #  '--window-size=1200,1800' , ,
             ~.x == ""
