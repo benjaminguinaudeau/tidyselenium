@@ -17,6 +17,7 @@ knitr::opts_chunk$set(
 
 ```
 
+
 ```{r, echo = FALSE, results='asis', eval = T}
 
 library(badger)

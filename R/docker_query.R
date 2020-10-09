@@ -1,7 +1,7 @@
 #' chrome_init
 #' @export
-chrome_init <- function(name = "", view = T, ua = NULL, cache = NULL){
-  browser_init(browser = "chrome", name = name, view = view, ua = ua, cache = cache)
+chrome_init <- function(name = "", view = T, ua = NULL, cache = NULL, host = NULL){
+  browser_init(browser = "chrome", name = name, view = view, ua = ua, cache = cache, host = host)
 }
 
 #' firefox_init
@@ -12,14 +12,15 @@ firefox_init <- function(name = "", view = T, ua = NULL, cache = NULL){
 
 #' browser_init
 #' @export
-browser_init <- function(browser = "chrome", name = "", view = T, ua = NULL, cache = NULL){
+browser_init <- function(browser = "chrome", name = "", view = T, ua = NULL, cache = NULL, img = NULL, host = NULL){
   
   if(!dockeR::is_docker_running()){stop("Docker daemon is not running, please start it and try again")}
   
   name <- ifelse(name == "", browser, name)
   
   if(!name %in% dockeR::existing_containers()){
-    dockeR::create_container(glue::glue("selenium/standalone-{browser}-debug"), name, other_arguments = "--shm-size=2g")
+    if(is.null(img)) img <- glue::glue("selenium/standalone-{browser}-debug")
+    dockeR::create_container(img, name, other_arguments = "--shm-size=2g")
     bashR::wait(4, .5)
   }
   
@@ -28,7 +29,7 @@ browser_init <- function(browser = "chrome", name = "", view = T, ua = NULL, cac
     bashR::wait(4, .5)
   }
   if(name %in% dockeR::running_containers()){
-    browser <- dockeR::quiet(get_driver(port = dockeR::get_port(name, 4444), ua = ua, cache_id = cache, browser = browser))
+    browser <- dockeR::quiet(get_driver(port = dockeR::get_port(name, 4444), ua = ua, cache_id = cache, browser = browser, host = host))
   }
   
   if(view == T){dockeR::view_container(name)}
@@ -38,7 +39,7 @@ browser_init <- function(browser = "chrome", name = "", view = T, ua = NULL, cac
 
 #' get_driver
 #' @export
-get_driver <- function(port, ua = NULL, browser = "chrome", cache_id = NULL){
+get_driver <- function(port, ua = NULL, browser = "chrome", cache_id = NULL, host = NULL){
   
   if(!is.null(ua)){
     if(is.character(ua)){
@@ -93,8 +94,10 @@ get_driver <- function(port, ua = NULL, browser = "chrome", cache_id = NULL){
     ecaps <- list()
   }
   
+  if(is.null(host)) host <- "localhost"
+  
   driver <- RSelenium::remoteDriver(
-    remoteServerAddr = "localhost",
+    remoteServerAddr = host,
     port = port,
     browserName = browser,
     extraCapabilities = ecaps

@@ -4,7 +4,15 @@
 \alias{browser_init}
 \title{browser_init}
 \usage{
-browser_init(browser = "chrome", name = "", view = T, ua = NULL, cache = NULL)
+browser_init(
+  browser = "chrome",
+  name = "",
+  view = T,
+  ua = NULL,
+  cache = NULL,
+  img = NULL,
+  host = NULL
+)
 }
 \description{
 browser_init
