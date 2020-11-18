@@ -1,3 +1,10 @@
+#' new_window
+#' @export
+new_window <- function(browser, ...){
+  browser$open()
+  return(invisible(browser))
+}
+
 #' go
 #' @export
 go <- function(browser, ...){

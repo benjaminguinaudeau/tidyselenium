@@ -147,15 +147,6 @@ screenshot <- function(browser, file = NULL, display = T, useViewer = T){
   return(invisible(browser))
 }
 
-#' new_window
-#' @export
-new_window <- function(port = 4444, prune = T, browser = "chrome"){
-  tmp <- get_driver(port = as.integer(port), browser = browser)
-  if(prune) tmp$closeall()
-  tmp$open()
-  return(tmp)
-}
-
 #' get_source_code
 #' @export
 get_source_code <- function(browser, filepath = NULL){
