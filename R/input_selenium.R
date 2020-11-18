@@ -6,9 +6,17 @@ send_keys <- function(browser, keys = list(), return = "browser"){
   if(return == "browser") return(invisible(browser))
 }
 
+#' quiet
+#' @export
+quiet <- function (x){
+  sink(tempfile())
+  on.exit(sink())
+  invisible(force(x))
+}
+
+
 #' keys
 #' @export
-
 keys <- RSelenium::selKeys
 
 #' clear

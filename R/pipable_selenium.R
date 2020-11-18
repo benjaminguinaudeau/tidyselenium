@@ -1,7 +1,7 @@
 #' new_window
 #' @export
 new_window <- function(browser, ...){
-  trash <- browser$open()
+  quiet(browser$open())
   return(invisible(browser))
 }
 
